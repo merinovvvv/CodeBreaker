@@ -9,6 +9,10 @@ import Foundation
 
 typealias Peg = String
 
+extension Peg {
+    static let missing = "clear"
+}
+
 struct CodeBreaker {
     static let colorChoices: [Peg] = ["red", "green", "yellow", "blue", "purple", "orange", "pink", "brown"]
     static let emojiChoices: [Peg] = ["🍏", "🤓", "❤️", "😎", "👽", "🤡"]
@@ -18,7 +22,7 @@ struct CodeBreaker {
     var masterCode: Code
     var guess: Code
     var attempts: [Code] = []
-    var isActive: Bool { !attempts.contains(guess) && guess.pegs.allSatisfy({$0 != Code.missing}) }
+    var isActive: Bool { !attempts.contains(guess) && guess.pegs.allSatisfy({$0 != Peg.missing}) }
     
     init(pegsCount: Int, pegChoices: [Peg] = ["red", "green", "yellow", "blue"]) {
         self.pegsCount = pegsCount
@@ -35,7 +39,7 @@ struct CodeBreaker {
             let newPeg = pegChoices[newPegIndex]
             guess.pegs[index] = newPeg
         } else {
-            guess.pegs[index] = pegChoices.first ?? Code.missing
+            guess.pegs[index] = pegChoices.first ?? Peg.missing
         }
     }
     
@@ -64,23 +68,21 @@ struct Code: Equatable {
     var kind: Kind
     var pegs: [Peg]
     
-    var matches: [Match] {
+    var matches: [Match]? {
         switch kind {
         case .attempt(let matches): return matches
-        default: return []
+        default: return nil
         }
     }
     
-    static let missing: Peg = "clear"
-    
     init(kind: Kind, pegsCount: Int) {
         self.kind = kind
-        self.pegs = Array(repeating: Code.missing, count: pegsCount)
+        self.pegs = Array(repeating: Peg.missing, count: pegsCount)
     }
     
     mutating func randomize(from pegChoices: [Peg]) {
         for index in pegs.indices {
-            pegs[index] = pegChoices.randomElement() ?? Code.missing
+            pegs[index] = pegChoices.randomElement() ?? Peg.missing
         }
     }
     
