@@ -5,18 +5,26 @@
 //  Created by Yaraslau Merynau on 08.07.2026.
 //
 
-import SwiftUI
+import Foundation
 
-typealias Peg = Color
+typealias Peg = String
 
 struct CodeBreaker {
-    var masterCode: Code = Code(kind: .master)
-    var guess: Code = Code(kind: .guess)
-    var attempts: [Code] = []
+    static let colorChoices: [Peg] = ["red", "green", "yellow", "blue", "purple", "orange", "pink", "brown"]
+    static let emojiChoices: [Peg] = ["🍏", "🤓", "❤️", "😎", "👽", "🤡"]
+    let pegsCount: Int
     let pegChoices: [Peg]
     
-    init(pegChoices: [Peg] = [.red, .green, .yellow, .blue]) {
+    var masterCode: Code
+    var guess: Code
+    var attempts: [Code] = []
+    var isActive: Bool { !attempts.contains(guess) && guess.pegs.allSatisfy({$0 != Code.missing}) }
+    
+    init(pegsCount: Int, pegChoices: [Peg] = ["red", "green", "yellow", "blue"]) {
+        self.pegsCount = pegsCount
         self.pegChoices = pegChoices
+        self.masterCode = Code(kind: .master, pegsCount: pegsCount)
+        self.guess = Code(kind: .guess, pegsCount: pegsCount)
         masterCode.randomize(from: pegChoices)
     }
     
@@ -34,13 +42,27 @@ struct CodeBreaker {
     mutating func attemptGuess() {
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
+        guard isActive else { return }
         attempts.append(attempt)
+    }
+    
+    mutating func restart() {
+        let newPegsCount = [3, 4, 5, 6].randomElement() ?? 4
+        let newPegChoices = [CodeBreaker.colorChoices, CodeBreaker.emojiChoices].randomElement() ?? CodeBreaker.colorChoices
+        self = CodeBreaker(pegsCount: newPegsCount, pegChoices: newPegChoices)
     }
 }
 
-struct Code {
+struct Code: Equatable {
+    enum Kind: Equatable {
+        case master
+        case guess
+        case attempt([Match])
+        case unknown
+    }
+    
     var kind: Kind
-    var pegs: [Peg] = Array(repeating: Code.missing, count: 4)
+    var pegs: [Peg]
     
     var matches: [Match] {
         switch kind {
@@ -49,13 +71,11 @@ struct Code {
         }
     }
     
-    static let missing: Peg = .clear
+    static let missing: Peg = "clear"
     
-    enum Kind: Equatable {
-        case master
-        case guess
-        case attempt([Match])
-        case unknown
+    init(kind: Kind, pegsCount: Int) {
+        self.kind = kind
+        self.pegs = Array(repeating: Code.missing, count: pegsCount)
     }
     
     mutating func randomize(from pegChoices: [Peg]) {

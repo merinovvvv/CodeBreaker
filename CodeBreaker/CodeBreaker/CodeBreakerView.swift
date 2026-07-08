@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
-    @State var game = CodeBreaker(pegChoices: [.blue, .green, .red, .purple])
+    @State var game = CodeBreaker(pegsCount: [3, 4, 5, 6].randomElement() ?? 4, pegChoices: ["blue", "green", "red", "purple"])
     
     var body: some View {
         VStack {
@@ -19,6 +19,7 @@ struct CodeBreakerView: View {
                     view(for: game.attempts[index])
                 }
             }
+            restartButton
         }
         .padding()
     }
@@ -31,19 +32,28 @@ struct CodeBreakerView: View {
         }
         .font(.system(size: 80))
         .minimumScaleFactor(0.1)
+        .disabled(!game.isActive)
+    }
+    
+    var restartButton: some View {
+        Button("Restart") {
+            withAnimation {
+                game.restart()
+            }
+        }
+        .font(.system(size: 35))
     }
     
     func view(for code: Code) -> some View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
-                Circle()
+                pegView(for: code.pegs[index])
                     .overlay {
                         if code.pegs[index] == Code.missing {
                             Circle().strokeBorder(.gray)
                         }
                     }
                     .contentShape(Circle())
-                    .foregroundStyle(code.pegs[index])
                     .onTapGesture {
                         if code.kind == .guess {
                             game.changeGuessPeg(at: index)
@@ -56,6 +66,15 @@ struct CodeBreakerView: View {
                         guessButton
                     }
                 }
+        }
+    }
+    
+    @ViewBuilder
+    private func pegView(for peg: Peg) -> some View {
+        if let color = Color(pegString: peg) {
+            Circle().foregroundStyle(color)
+        } else {
+            Text(peg).font(.system(size: 40))
         }
     }
 }
