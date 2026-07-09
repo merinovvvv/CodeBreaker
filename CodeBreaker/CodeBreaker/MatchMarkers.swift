@@ -14,17 +14,20 @@ enum Match {
 }
 
 struct MatchMarkers: View {
+    // MARK: Data In
     let matches: [Match]
     
     private var rows: [[Int]] {
         switch matches.count {
-        case 3: return [[0, 1, 2]]
+        case 3: return [[0, 1], [2]]
         case 4: return [[0, 1], [2, 3]]
         case 5: return [[0, 1, 2], [3, 4]]
         case 6: return [[0, 1, 2], [3, 4, 5]]
         default: return [[0, 1], [2, 3]]
         }
     }
+    
+    // MARK: - Body
     
     var body: some View {
         VStack {
