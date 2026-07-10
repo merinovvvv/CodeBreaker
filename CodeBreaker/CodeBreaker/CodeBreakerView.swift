@@ -27,13 +27,22 @@ struct CodeBreakerView: View {
     
     var body: some View {
         VStack {
-            view(for: game.masterCode)
+            CodeView(code: game.masterCode)
+                .transaction { transaction in
+                    transaction.animation = .none
+                }
             ScrollView {
                 if !game.isOver {
-                    view(for: game.guess)
+                    CodeView(code: game.guess, selected: $selected) {
+                        guessButton
+                    }
                 }
                 ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                    view(for: game.attempts[index])
+                    CodeView(code: game.attempts[index]) {
+                        if let mathces = game.attempts[index].matches {
+                            MatchMarkers(matches: mathces)
+                        }
+                    }
                 }
             }
             PegChooser(choices: game.pegChoices) { peg in
@@ -60,25 +69,11 @@ struct CodeBreakerView: View {
     
     var restartButton: some View {
         Button("Restart") {
-            game.restart()
+            withAnimation {
+                game.restart()
+            }
         }
         .font(.system(size: RestartButton.fontSize))
-    }
-    
-    func view(for code: Code) -> some View {
-        HStack {
-            CodeView(code: code, selected: $selected)
-            Circle().foregroundStyle(Color.clear)
-                .overlay {
-                    if let mathces = code.matches {
-                        MatchMarkers(matches: mathces)
-                    } else {
-                        if code.kind == .guess {
-                            guessButton
-                        }
-                    }
-                }
-        }
     }
 }
 
