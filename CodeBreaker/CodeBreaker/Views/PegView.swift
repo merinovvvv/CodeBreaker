@@ -27,11 +27,6 @@ struct PegView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .aspectRatio(1, contentMode: .fit)
-        .overlay {
-            if peg == Peg.missing {
-                pegShape.strokeBorder(.gray)
-            }
-        }
         .contentShape(pegShape)
     }
 }

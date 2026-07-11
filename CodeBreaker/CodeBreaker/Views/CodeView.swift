@@ -18,7 +18,10 @@ struct CodeView<HelperView>: View where HelperView: View {
     @ViewBuilder var helperView: () -> HelperView
     
     // MARK: Data shared
-    @Binding var selected: Int
+    @Binding var selection: Int
+    
+    // MARK: Data Owned by Me
+    @Namespace private var selectionNamespace
     
     // MARK: - Init
     init(
@@ -27,7 +30,7 @@ struct CodeView<HelperView>: View where HelperView: View {
         @ViewBuilder helperView: @escaping () -> HelperView = { EmptyView() }
     ) {
         self.code = code
-        self._selected = selected
+        self._selection = selected
         self.helperView = helperView
     }
     
@@ -38,16 +41,21 @@ struct CodeView<HelperView>: View where HelperView: View {
             ForEach(code.pegs.indices, id: \.self) { index in
                 PegView(peg: code.pegs[index])
                     .background {
-                        if selected == index, code.kind == .guess {
-                            Selection.shape.foregroundStyle(.gray.opacity(0.3))
+                        Group {
+                            if selection == index, code.kind == .guess {
+                                Selection.shape
+                                    .foregroundStyle(.gray.opacity(0.3))
+                                    .matchedGeometryEffect(id: "selection", in: selectionNamespace)
+                            }
                         }
+                        .animation(.selection, value: selection)
                     }
                     .overlay {
                         Selection.shape.foregroundStyle(code.isHidden ? .gray : .clear)
                     }
                     .onTapGesture {
                         if code.kind == .guess {
-                            selected = index
+                            selection = index
                         }
                     }
             }

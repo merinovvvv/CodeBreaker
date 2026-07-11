@@ -19,3 +19,21 @@ extension Color {
         self = color
     }
 }
+
+extension Animation {
+    static let codeBreaker = Animation.bouncy
+    static let guess = codeBreaker
+    static let restart = codeBreaker
+    static let selection = codeBreaker
+}
+
+extension AnyTransition {
+    static let pegChooser = AnyTransition.offset(x: 0, y: 200)
+    static func attempts(_ isGameOver: Bool) -> AnyTransition {
+        .asymmetric(
+            insertion: isGameOver ? .identity : .move(edge: .top),
+            removal: .offset(x: 400, y: 0)
+        )
+    }
+    
+}
