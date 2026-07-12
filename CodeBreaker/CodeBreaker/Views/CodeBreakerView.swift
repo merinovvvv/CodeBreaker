@@ -53,6 +53,7 @@ struct CodeBreakerView: View {
                     .transition(.attempts(game.isOver))
                 }
             }
+            .scrollIndicators(.hidden)
             if !game.isOver {
                 PegChooser(choices: game.pegChoices, onChoose: changePeg)
                     .transition(.pegChooser)
