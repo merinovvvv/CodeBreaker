@@ -37,3 +37,11 @@ extension AnyTransition {
     }
     
 }
+
+extension View {
+    func flexibleSize(minimum: CGFloat = 8, maximum: CGFloat = 80) -> some View {
+        self
+            .font(.system(size: maximum))
+            .minimumScaleFactor(minimum / maximum)
+    }
+}

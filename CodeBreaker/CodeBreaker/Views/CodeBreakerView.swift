@@ -9,12 +9,6 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     // MARK: Constants
-    struct GuessButton {
-        static let maxFontSize: CGFloat = 80
-        static let minFontSize: CGFloat = 8
-        static let minimumScaleFactor = minFontSize / maxFontSize
-    }
-    
     struct RestartButton {
         static let fontSize: CGFloat = 35
     }
@@ -31,7 +25,12 @@ struct CodeBreakerView: View {
     
     var body: some View {
         VStack {
-            CodeView(code: game.masterCode)
+            CodeView(code: game.masterCode) {
+                TimerView(startDate: game.startDate, endDate: game.endDate)
+                    .flexibleSize()
+                    .monospaced()
+                    .lineLimit(1)
+            }
                 .transaction { transaction in
                     transaction.animation = .none
                 }
@@ -39,6 +38,7 @@ struct CodeBreakerView: View {
                 if !game.isOver || restarting {
                     CodeView(code: game.guess, selected: $selection) {
                         guessButton
+                            .flexibleSize()
                     }
                     .opacity(restarting ? 0 : 1)
                     .animation(nil, value: game.attempts.count)
@@ -80,8 +80,6 @@ struct CodeBreakerView: View {
                 }
             }
         }
-        .font(.system(size: GuessButton.maxFontSize))
-        .minimumScaleFactor(GuessButton.minimumScaleFactor)
         .disabled(!game.isActive)
     }
     
