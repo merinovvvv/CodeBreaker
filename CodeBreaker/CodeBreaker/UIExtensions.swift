@@ -11,7 +11,8 @@ extension Color {
     private static let knownPegColors: [String: Color] = [
         "red": .red, "green": .green, "yellow": .yellow,
         "blue": .blue, "purple": .purple, "orange": .orange,
-        "pink": .pink, "clear": .clear, "brown": .brown
+        "pink": .pink, "clear": .clear, "brown": .brown,
+        "cyan": .cyan, "gray": .gray
     ]
     
     init?(pegString: String) {

@@ -13,9 +13,10 @@ struct CodeBreakerView: View {
         static let fontSize: CGFloat = 35
     }
     
-    // MARK: Data Owned by me
-    @State private var game = CodeBreaker(pegsCount: [3, 4, 5, 6].randomElement() ?? 4, pegChoices: ["blue", "green", "red", "purple"])
+    // MARK: Data In
+    let game: CodeBreaker
     
+    // MARK: Data Owned by me
     @State private var selection: Int = 0
     @State private var restarting: Bool = false
     @State private var hideMostRecentMarkers: Bool = false
@@ -43,10 +44,10 @@ struct CodeBreakerView: View {
                     .opacity(restarting ? 0 : 1)
                     .animation(nil, value: game.attempts.count)
                 }
-                ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                    CodeView(code: game.attempts[index]) {
-                        let isShowMarkers = !hideMostRecentMarkers || index != game.attempts.count - 1
-                        if isShowMarkers, let mathces = game.attempts[index].matches {
+                ForEach(game.attempts.reversed(), id: \.pegs) { attempt in
+                    CodeView(code: attempt) {
+                        let isShowMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.last?.pegs
+                        if isShowMarkers, let mathces = attempt.matches {
                             MatchMarkers(matches: mathces)
                         }
                     }
@@ -112,5 +113,5 @@ struct CodeBreakerView: View {
 }
 
 #Preview {
-    CodeBreakerView()
+    CodeBreakerView(game: CodeBreaker(name: "Preview", pegsCount: 3, pegChoices: ["red", "green", "blue"]))
 }

@@ -13,7 +13,7 @@ extension Peg {
     static let missing = "clear"
 }
 
-struct CodeBreaker {
+@Observable class CodeBreaker {
     static let colorChoices: [Peg] = ["red", "green", "yellow", "blue", "purple", "orange", "pink", "brown"]
     static let emojiChoices: [Peg] = ["🍏", "🤓", "❤️", "😎", "👽", "🤡"]
     
@@ -33,7 +33,10 @@ struct CodeBreaker {
     var startDate: Date = .now
     var endDate: Date?
     
-    init(pegsCount: Int, pegChoices: [Peg] = ["red", "green", "yellow", "blue"]) {
+    var name: String
+    
+    init(name: String = "CodeBreaker", pegsCount: Int, pegChoices: [Peg] = ["red", "green", "yellow", "blue"]) {
+        self.name = name
         self.pegsCount = pegsCount
         self.pegChoices = pegChoices
         self.masterCode = Code(kind: .master(isHidden: true), pegsCount: pegsCount)
@@ -42,7 +45,7 @@ struct CodeBreaker {
         print(masterCode.pegs)
     }
     
-    mutating func changeGuessPeg(at index: Int) {
+    func changeGuessPeg(at index: Int) {
         let existingPeg = guess.pegs[index]
         if let indexOfExistingPegInPegChoices = pegChoices.firstIndex(of: existingPeg) {
             let newPegIndex = (indexOfExistingPegInPegChoices + 1) % pegChoices.count
@@ -53,7 +56,7 @@ struct CodeBreaker {
         }
     }
     
-    mutating func attemptGuess() {
+    func attemptGuess() {
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
         guard isActive else { return }
@@ -65,16 +68,26 @@ struct CodeBreaker {
         }
     }
     
-    mutating func restart() {
+    func restart() {
         let newPegsCount = [3, 4, 5, 6].randomElement() ?? 4
         let newPegChoices = [CodeBreaker.colorChoices, CodeBreaker.emojiChoices].randomElement() ?? CodeBreaker.colorChoices
         startDate = .now
         endDate = nil
-        self = CodeBreaker(pegsCount: newPegsCount, pegChoices: newPegChoices)
+        //self = CodeBreaker(pegsCount: newPegsCount, pegChoices: newPegChoices)
     }
     
-    mutating func changeSelectedGuess(_ peg: Peg, at selected: Int) {
+    func changeSelectedGuess(_ peg: Peg, at selected: Int) {
         guard guess.pegs.indices.contains(selected) else { return }
         guess.pegs[selected] = peg
+    }
+}
+
+extension CodeBreaker: Identifiable, Hashable, Equatable {
+    static func ==(lhs: CodeBreaker, rhs: CodeBreaker) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
