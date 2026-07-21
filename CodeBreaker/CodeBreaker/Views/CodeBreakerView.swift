@@ -26,12 +26,7 @@ struct CodeBreakerView: View {
     
     var body: some View {
         VStack {
-            CodeView(code: game.masterCode) {
-                TimerView(startDate: game.startDate, endDate: game.endDate)
-                    .flexibleSize()
-                    .monospaced()
-                    .lineLimit(1)
-            }
+            CodeView(code: game.masterCode)
                 .transaction { transaction in
                     transaction.animation = .none
                 }
@@ -58,9 +53,19 @@ struct CodeBreakerView: View {
             if !game.isOver {
                 PegChooser(choices: game.pegChoices, onChoose: changePeg)
                     .transition(.pegChooser)
+                    .frame(maxHeight: 100)
             }
-            restartButton
-                .opacity(finishing ? 0 : 1)
+        }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                restartButton
+                    .opacity(finishing ? 0 : 1)
+            }
+            ToolbarItem {
+                TimerView(startDate: game.startDate, endDate: game.endDate)
+                    .monospaced()
+                    .lineLimit(1)
+            }
         }
         .padding()
     }
@@ -85,7 +90,7 @@ struct CodeBreakerView: View {
     }
     
     var restartButton: some View {
-        Button("Restart") {
+        Button("Restart", systemImage: "restart.circle") {
             withAnimation(.restart) {
                 restarting = true
                 game.attempts.removeAll()

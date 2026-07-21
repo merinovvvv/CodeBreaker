@@ -15,6 +15,10 @@ extension Color {
         "cyan": .cyan, "gray": .gray
     ]
     
+    var pegString: String? {
+        return Color.knownPegColors.first(where: { $0.value == self })?.key
+    }
+    
     init?(pegString: String) {
         guard let color = Color.knownPegColors[pegString] else { return nil }
         self = color
@@ -33,7 +37,7 @@ extension AnyTransition {
     static func attempts(_ isGameOver: Bool) -> AnyTransition {
         .asymmetric(
             insertion: isGameOver ? .identity : .move(edge: .top),
-            removal: .offset(x: 400, y: 0)
+            removal: .move(edge: .trailing).combined(with: .offset(x: 50))
         )
     }
     

@@ -19,9 +19,8 @@ extension Peg {
     
     //MARK: - Data In
     
-    let pegsCount: Int
-    let pegChoices: [Peg]
-    
+    var pegsCount: Int
+    var pegChoices: [Peg]
     var masterCode: Code
     var guess: Code
     var attempts: [Code] = []
@@ -69,11 +68,14 @@ extension Peg {
     }
     
     func restart() {
-        let newPegsCount = [3, 4, 5, 6].randomElement() ?? 4
-        let newPegChoices = [CodeBreaker.colorChoices, CodeBreaker.emojiChoices].randomElement() ?? CodeBreaker.colorChoices
+        pegsCount = [3, 4, 5, 6].randomElement() ?? 4
+        pegChoices = [CodeBreaker.colorChoices, CodeBreaker.emojiChoices].randomElement() ?? CodeBreaker.colorChoices
+        masterCode = Code(kind: .master(isHidden: true), pegsCount: pegsCount)
+        guess = Code(kind: .guess, pegsCount: pegsCount)
+        attempts = []
+        masterCode.randomize(from: pegChoices)
         startDate = .now
         endDate = nil
-        //self = CodeBreaker(pegsCount: newPegsCount, pegChoices: newPegChoices)
     }
     
     func changeSelectedGuess(_ peg: Peg, at selected: Int) {
